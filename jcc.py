@@ -4,8 +4,6 @@ import datetime
 
 # 各年号の元年を定義
 eraDict = {
-    "明治": 1868,
-    "大正": 1912,
     "昭和": 1926,
     "平成": 1989,
     "令和": 2019,
@@ -30,5 +28,4 @@ def japanese_calendar_converter(text):
     # date型に変換して返す
     return datetime.date(year, int(date.group("month")), int(date.group("day")))
 
-print(japanese_calendar_converter("昭和53年9月26日"))
 

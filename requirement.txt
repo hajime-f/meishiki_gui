@@ -1,2 +1,2 @@
-tk==0.1.0
-customtkinter==0.3
+tk
+customtkinter

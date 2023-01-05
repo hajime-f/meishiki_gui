@@ -1,26 +1,13 @@
-import tkinter as tk
 import customtkinter as ctk
 from jcc import wareki_converter, time_converter
+from meishiki import Meishiki
 
 
 def main(birthday, t_flag, sex):
-    pass
-
-
-def button_callback():
-
-    date_text = combobox_1.get() + combobox_6.get() + combobox_2.get() + combobox_3.get()
-    date = wareki_converter(date_text)
     
-    time_text = combobox_4.get() + combobox_5.get()
-    birthday, t_flag = time_converter(date, time_text)
+    meishiki = Meishiki(birthday, t_flag, sex)
+    meishiki.build_meishiki()
 
-    if combobox_7.get() == "男性":
-        sex = 0
-    else:
-        sex = 1
-    
-    main(birthday, t_flag, sex)
     
 
 ctk.set_appearance_mode("system")
@@ -37,7 +24,20 @@ def cb1_selected(event):
     combobox_6.configure(values=dict[combobox_1.get()])
     combobox_6.set(dict[combobox_1.get()][0])
 
+    
+def button_callback():
 
+    date_text = combobox_1.get() + combobox_6.get() + combobox_2.get() + combobox_3.get()
+    date = wareki_converter(date_text)
+    
+    time_text = combobox_4.get() + combobox_5.get()
+    birthday, t_flag = time_converter(date, time_text)
+
+    sex = 0 if combobox_7.get() == "男性" else 1
+    
+    main(birthday, t_flag, sex)
+
+    
 combobox_1 = ctk.CTkComboBox(app, values=list(dict.keys()), command=cb1_selected, width=100)
 combobox_1.pack(pady=10, padx=10)
 combobox_1.set("西暦")

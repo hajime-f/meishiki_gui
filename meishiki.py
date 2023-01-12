@@ -11,6 +11,7 @@ class Meishiki:
         self.birthday = birthday
         self.t_flag = t_flag
         self.sex = sex
+        self.meishiki = {}
 
 
     def is_setsuiri_year(self):
@@ -129,8 +130,63 @@ class Meishiki:
         else:
             t_zkan = -1
         
-        print(kd.kan[y_kan], kd.shi[y_shi], kd.kan[y_zkan])
-        print(kd.kan[m_kan], kd.shi[m_shi], kd.kan[m_zkan])
-        print(kd.kan[d_kan], kd.shi[d_shi], kd.kan[d_zkan])
-        print(kd.kan[t_kan], kd.shi[t_shi], kd.kan[t_zkan])
+        tenkan = [y_kan, m_kan, d_kan, t_kan]
+        chishi = [y_shi, m_shi, d_shi, t_shi]
+        zokan = [y_zkan, m_zkan, d_zkan, t_zkan]
         
+        nenchu = [y_kan, y_shi, y_zkan]
+        getchu = [m_kan, m_shi, m_zkan]
+        nitchu = [d_kan, d_shi, d_zkan]
+        jichu  = [t_kan, t_shi, t_zkan]
+        
+        # 五行（木火土金水）のそれぞれの数を得る
+        gogyo = [0] * 5
+        for t in tenkan:
+            if t != -1:
+                gogyo[kd.gogyo_kan[t]] += 1
+        for s in chishi:
+            if s != -1:
+                gogyo[kd.gogyo_shi[s]] += 1
+
+        # 通変を得る
+        tsuhen = []
+        for i in tenkan + zokan:
+            if i == -1:
+                tsuhen.append(-1)
+            else:
+                tsuhen.append(kd.kan_tsuhen[tenkan[2]].index(i))
+
+        # 十二運を得る
+        twelve_fortune = []
+        for i in chishi:
+            if i == -1:
+                twelve_fortune.append(-1)
+            else:
+                twelve_fortune.append(kd.twelve_table[tenkan[2]][i])
+
+        # 調候を得る
+        kd.choko[d_kan][self.birthday.month - 1]
+
+        # 空亡を得る
+        d = self.birthday.day + kd.kisu_table[(self.birthday.year - 1926) % 80][self.birthday.month - 1] - 1
+        if d >= 60:
+            d -= 60  # d が 60 を超えたら 60 を引く
+        kubo = kd.kubo[d // 10]
+        
+        # クラス変数 meishiki に情報を追加する
+        self.meishiki.update({"tenkan": tenkan})
+        self.meishiki.update({"chishi": chishi})
+        self.meishiki.update({"zokan" : zokan})
+        self.meishiki.update({"nenchu": nenchu})
+        self.meishiki.update({"getchu": getchu})
+        self.meishiki.update({"nitchu": nitchu})
+        self.meishiki.update({"jichu" : jichu})
+        self.meishiki.update({"gogyo" : gogyo})
+        self.meishiki.update({"tsuhen": tsuhen})
+        self.meishiki.update({"twelve_fortune": twelve_fortune})
+        self.meishiki.update({"choko": choko})
+        self.meishiki.update({"kubo": kubo})
+
+
+
+                

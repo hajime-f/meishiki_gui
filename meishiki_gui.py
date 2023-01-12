@@ -1,15 +1,17 @@
 import customtkinter as ctk
 from jcc import wareki_converter, time_converter
 from meishiki import Meishiki
-
+from unsei import Unsei
 
 def main(birthday, t_flag, sex):
     
     meishiki = Meishiki(birthday, t_flag, sex)
     meishiki.build_meishiki()
-
     
-
+    
+    
+    
+    
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("blue")
 

@@ -138,6 +138,7 @@ class Meishiki:
         getchu = [m_kan, m_shi, m_zkan]
         nitchu = [d_kan, d_shi, d_zkan]
         jichu  = [t_kan, t_shi, t_zkan]
+        nikkan = d_kan
         
         # 五行（木火土金水）のそれぞれの数を得る
         gogyo = [0] * 5
@@ -165,7 +166,7 @@ class Meishiki:
                 twelve_fortune.append(kd.twelve_table[tenkan[2]][i])
 
         # 調候を得る
-        kd.choko[d_kan][self.birthday.month - 1]
+        choko = kd.choko[d_kan][self.birthday.month - 1]
 
         # 空亡を得る
         d = self.birthday.day + kd.kisu_table[(self.birthday.year - 1926) % 80][self.birthday.month - 1] - 1
@@ -181,6 +182,7 @@ class Meishiki:
         self.meishiki.update({"getchu": getchu})
         self.meishiki.update({"nitchu": nitchu})
         self.meishiki.update({"jichu" : jichu})
+        self.meishiki.update({"nikkan" : nikkan})
         self.meishiki.update({"gogyo" : gogyo})
         self.meishiki.update({"tsuhen": tsuhen})
         self.meishiki.update({"twelve_fortune": twelve_fortune})

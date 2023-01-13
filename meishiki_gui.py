@@ -1,15 +1,22 @@
+import os
 import customtkinter as ctk
+import webbrowser
 from jcc import wareki_converter, time_converter
 from meishiki import Meishiki
 from unsei import Unsei
+from output import output_html
 
 def main(birthday, t_flag, sex):
     
     meishiki = Meishiki(birthday, t_flag, sex)
     meishiki.build_meishiki()
     
-    
-    
+    unsei = Unsei(meishiki)
+    unsei.build_unsei()
+
+    f = output_html(meishiki, unsei)
+    cwd = os.getcwd()
+    webbrowser.open('file://' + cwd + '/'+ f)
     
     
 ctk.set_appearance_mode("system")

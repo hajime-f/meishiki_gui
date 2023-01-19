@@ -18,7 +18,7 @@ class Unsei:
         if not p:
             previous_setsuiri = dt(year = self.birthday.year, month = self.birthday.month, day = kd.setsuiri[self.birthday.month - 1], hour = 0, minute = 0)
             if self.birthday.month == 12:
-                next_setsuiri = dt(year = self.birthday + 1, month = 1, day = kd.setsuiri[0], hour = 0, minute = 0)
+                next_setsuiri = dt(year = self.birthday.year + 1, month = 1, day = kd.setsuiri[0], hour = 0, minute = 0)
             else:
                 next_setsuiri = dt(year = self.birthday.year, month = self.birthday.month + 1, day = kd.setsuiri[self.birthday.month], hour = 0, minute = 0)    
         else:

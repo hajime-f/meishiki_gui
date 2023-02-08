@@ -9,6 +9,7 @@ eraDict = {
     "令和": 2019,
 }
 
+
 def wareki_converter(text):
     
     # 正規化

@@ -1,24 +1,27 @@
 import os
-import customtkinter as ctk
 import webbrowser
-from jcc import wareki_converter, time_converter
+
+import customtkinter as ctk
+
+from jcc import time_converter, wareki_converter
 from meishiki import Meishiki
-from unsei import Unsei
 from output import output_html
+from unsei import Unsei
+
 
 def main(birthday, t_flag, sex):
-    
+
     meishiki = Meishiki(birthday, t_flag, sex)
     meishiki.build_meishiki()
-    
+
     unsei = Unsei(meishiki)
     unsei.build_unsei()
 
     f = output_html(meishiki, unsei)
     cwd = os.getcwd()
-    webbrowser.open('file://' + cwd + '/'+ f)
-    
-    
+    webbrowser.open('file://' + cwd + '/' + f)
+
+
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("blue")
 
@@ -29,24 +32,25 @@ app.resizable(False, False)
 
 dict = {'西暦': ['1926年', '1927年', '1928年', '1929年', '1930年', '1931年', '1932年', '1933年', '1934年', '1935年', '1936年', '1937年', '1938年', '1939年', '1940年', '1941年', '1942年', '1943年', '1944年', '1945年', '1946年', '1947年', '1948年', '1949年', '1950年', '1951年', '1952年', '1953年', '1954年', '1955年', '1956年', '1957年', '1958年', '1959年', '1960年', '1961年', '1962年', '1963年', '1964年', '1965年', '1966年', '1967年', '1968年', '1969年', '1970年', '1971年', '1972年', '1973年', '1974年', '1975年', '1976年', '1977年', '1978年', '1979年', '1980年', '1981年', '1982年', '1983年', '1984年', '1985年', '1986年', '1987年', '1988年', '1989年', '1990年', '1991年', '1992年', '1993年', '1994年', '1995年', '1996年', '1997年', '1998年', '1999年', '2000年', '2001年', '2002年', '2003年', '2004年', '2005年', '2006年', '2007年', '2008年', '2009年', '2010年', '2011年', '2012年', '2013年', '2014年', '2015年', '2016年', '2017年', '2018年', '2019年', '2020年', '2021年', '2022年', '2023年', '2024年', '2025年', '2026年', '2027年', '2028年', '2029年', '2030年', '2031年', '2032年', '2033年', '2034年', '2035年', '2036年', '2037年', '2038年', '2039年', '2040年', ], '昭和': ['元年', '2年', '3年', '4年', '5年', '6年', '7年', '8年', '9年', '10年', '11年', '12年', '13年', '14年', '15年', '16年', '17年', '18年', '19年', '20年', '21年', '22年', '23年', '24年', '25年', '26年', '27年', '28年', '29年', '30年', '31年', '32年', '33年', '34年', '35年', '36年', '37年', '38年', '39年', '40年', '41年', '42年', '43年', '44年', '45年', '46年', '47年', '48年', '49年', '50年', '51年', '52年', '53年', '54年', '55年', '56年', '57年', '58年', '59年', '60年', '61年', '62年', '63年', '64年'], '平成': ['元年', '2年', '3年', '4年', '5年', '6年', '7年', '8年', '9年', '10年', '11年', '12年', '13年', '14年', '15年', '16年', '17年', '18年', '19年', '20年', '20年', '21年', '22年', '23年', '24年', '25年', '26年', '27年', '28年', '29年', '30年', '31年'], '令和': ['元年', '2年', '3年', '4年', '5年', '6年', '7年', '8年', '9年', '10年', '11年', '12年', '13年', '14年', '15年', '16年', '17年', '18年', '19年', '20年', '21年', '22年']}
 
+
 def cb1_selected(event):
     combobox_6.configure(values=dict[combobox_1.get()])
     combobox_6.set(dict[combobox_1.get()][0])
 
-    
+
 def button_callback():
 
     date_text = combobox_1.get() + combobox_6.get() + combobox_2.get() + combobox_3.get()
     date = wareki_converter(date_text)
-    
+
     time_text = combobox_4.get() + combobox_5.get()
     birthday, t_flag = time_converter(date, time_text)
 
     sex = 0 if combobox_7.get() == "男性" else 1
-    
+
     main(birthday, t_flag, sex)
 
-    
+
 combobox_1 = ctk.CTkComboBox(app, values=list(dict.keys()), command=cb1_selected, width=100)
 combobox_1.pack(pady=10, padx=10)
 combobox_1.set("西暦")
@@ -81,10 +85,8 @@ combobox_7.pack(pady=10, padx=10)
 combobox_7.set("男性")
 combobox_7.place(x=755, y=35)
 
-button_1 = ctk.CTkButton(master=app, command=button_callback, text="命式生成", width=220)
+button_1 = ctk.CTkButton(master=app, command=button_callback, text="命式生成", width = 220)
 button_1.pack(pady=10, padx=10)
 button_1.place(x=635, y=100)
 
 app.mainloop()
-
-

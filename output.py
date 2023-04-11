@@ -1,3 +1,4 @@
+import os
 from datetime import datetime as dt
 
 from jinja2 import Environment, FileSystemLoader
@@ -13,11 +14,20 @@ def output_html(meishiki, unsei):
     wareki = kd.convert_to_wareki(meishiki.birthday)
 
     if meishiki.t_flag == 1:
-        birthday_str = meishiki.birthday.strftime(
-            f'{wareki}%-m月%-d日 %-H時%-M分生')
+        if os.name == 'nt':
+            birthday_str = meishiki.birthday.strftime(
+                f'{wareki}%#m月%#d日 %#H時%#M分生')
+        else:
+            birthday_str = meishiki.birthday.strftime(
+                f'{wareki}%-m月%-d日 %-H時%-M分生')
     else:
-        birthday_str = meishiki.birthday.strftime(f'{wareki}%-m月%-d日 -時-分生')
-    sex_str = '男命' if meishiki.sex == 0 else '女命'
+        if os.name == 'nt':
+            birthday_str = meishiki.birthday.strftime(
+                f'{wareki}%#m月%#d日 -時-分生')
+        else:
+            birthday_str = meishiki.birthday.strftime(
+                f'{wareki}%-m月%-d日 -時-分生')
+        sex_str = '男命' if meishiki.sex == 0 else '女命'
 
     daiun = unsei.unsei["daiun"]
     nenun = unsei.unsei["nenun"]

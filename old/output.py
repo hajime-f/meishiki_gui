@@ -11,12 +11,7 @@ def output_html(meishiki, unsei):
     template = env.get_template('template.html')
 
     wareki = kd.convert_to_wareki(meishiki.birthday)
-
-    if meishiki.t_flag == 1:
-        birthday_str = meishiki.birthday.strftime(
-            f'{wareki}%-m月%-d日 %-H時%-M分生')
-    else:
-        birthday_str = meishiki.birthday.strftime(f'{wareki}%-m月%-d日 -時-分生')
+    birthday_str = meishiki.birthday.strftime(f'{wareki}%-m月%-d日 %-H時%-M分生')
     sex_str = '男命' if meishiki.sex == 0 else '女命'
 
     daiun = unsei.unsei["daiun"]

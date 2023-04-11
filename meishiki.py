@@ -1,194 +1,341 @@
-import kanshi_data as kd
-from datetime import datetime as dt
-from datetime import timedelta as td
+import sys
+from datetime import datetime, timedelta
 
+import kanshi_data as kd
 
 
 class Meishiki:
+    """
+    命式のクラス
+    """
 
     def __init__(self, birthday, t_flag, sex):
-        
+
         self.birthday = birthday
         self.t_flag = t_flag
         self.sex = sex
         self.meishiki = {}
 
+    def is_setsuiri(self, birthday, month):
+        """
+        ＜機能＞
+        birthday の年月日が、month で与えられた月に対して節入りしているか否かを判定する
+        ＜入力＞
+        - birthday（datetime）：誕生日
+        - month（int）：基準となる月
+        ＜出力＞
+        - 節入りしている（0）またはしていない（-1）の二値
+        ＜異常検出＞
+        判定不可能の場合はエラーメッセージを出力して強制終了する
+        """
 
-    def is_setsuiri_year(self):
+        for s in kd.setsuiri:
+            if (s[0] == birthday.year) and (s[1] == month):
+                setsuiri = datetime(year=s[0], month=s[1], day=s[2],
+                                    hour=s[3], minute=s[4])
+                if setsuiri < birthday:
+                    return 0    # 節入りしている
+                else:
+                    return -1   # 節入りしていない
 
-        start = dt(year = self.birthday.year, month = 1, day = 1, hour = 0, minute = 0)
-        end = dt(year = self.birthday.year, month = 2, day = kd.setsuiri[1], hour = 0, minute = 0)
-        if start <= self.birthday < end:
-            return -1
-        else:
-            return 0
-        
+        print('節入りを判定できませんでした。')
+        sys.exit(1)
 
-    def find_year_kanshi(self):
-        
-        sixty_kanshi_idx = (self.birthday.year - 3) % 60 - 1 + self.is_setsuiri_year()
-        y_kan, y_shi = kd.sixty_kanshi[sixty_kanshi_idx]
-        return y_kan, y_shi
-    
-    
-    def is_setsuiri_month(self):
+    def find_year_kanshi(self, birthday):
+        """
+        ＜機能＞
+        birthday の生年月日の年干支を取得する
+        ＜入力＞
+            - birthday（datetime）：誕生日
+        ＜出力＞
+            - y_kan（int）：年干の番号
+            - y_shi（int）：年支の番号
+        ＜異常検出＞
+        取得できなかった場合はエラーメッセージを出力して強制終了する
+        """
 
-        start = dt(year = self.birthday.year, month = self.birthday.month, day = 1, hour = 0, minute = 0)
-        end = dt(year = self.birthday.year, month = self.birthday.month, day = kd.setsuiri[self.birthday.month - 1], hour = 0, minute = 0)
-        if start <= self.birthday < end:
-            return -1
-        else:
-            return 0
-    
-    
-    def find_month_kanshi(self, y_kan):
-        
-        month = self.birthday.month - 1 + self.is_setsuiri_month()
-        m_kan, m_shi = kd.month_kanshi[y_kan][month]
-        return m_kan, m_shi
-        
+        sixty_kanshi_idx = \
+            (birthday.year - 3) % 60 - 1 + self.is_setsuiri(birthday, 2)
+        try:
+            y_kan, y_shi = kd.sixty_kanshi[sixty_kanshi_idx]
+            return y_kan, y_shi
+        except IndexError:
+            print('年干支の計算で例外が送出されました。')
+            sys.exit(1)
 
-    def find_day_kanshi(self):
-        
-        d = self.birthday.day + kd.kisu_table[(self.birthday.year - 1926) % 80][self.birthday.month - 1] - 1
+    def find_month_kanshi(self, birthday, y_kan):
+        """
+        ＜機能＞
+        birthday の生年月日の月干支を取得する
+        ＜入力＞
+          - birthday（datetime）：誕生日
+          - y_kan（int）：年干の番号
+        ＜出力＞
+          - m_kan（int）：月干の番号
+          - m_shi（int）：月支の番号
+        ＜異常検出＞
+        取得できなかった場合はエラーメッセージを出力して強制終了する
+        """
+
+        month = birthday.month - 1 + self.is_setsuiri(birthday, birthday.month)
+        try:
+            m_kan, m_shi = kd.month_kanshi[y_kan][month]
+            return m_kan, m_shi
+        except IndexError:
+            print('月干支の計算で例外が送出されました。')
+            sys.exit(1)
+
+    def find_day_kanshi(self, birthday):
+        """
+        ＜機能＞
+        birthday で与えられた生年月日の日干支を取得する
+        ＜入力＞
+          - birthday（daytime）：誕生日
+        ＜出力＞
+          - d_kan（int）：日干の番号
+          - d_shi（int）：日支の番号
+        ＜異常検出＞
+        取得できなかった場合はエラーメッセージを出力して強制終了する
+        """
+        try:
+            d = birthday.day + \
+                kd.kisu_table[birthday.year - 1926][birthday.month - 1] - 1
+        except IndexError:
+            print('生年は1926年以降でなければなりません。')
+            sys.exit(1)
+
         if d >= 60:
-            d -= 60
-        d_kan, d_shi = kd.sixty_kanshi[d]
-        return d_kan, d_shi
+            d -= 60  # d が 60 を超えたら 60 を引く
 
+        try:
+            d_kan, d_shi = kd.sixty_kanshi[d]
+            return d_kan, d_shi
+        except IndexError:
+            print('日干支の計算で例外が送出されました。')
+            sys.exit(1)
 
-    def find_time_kanshi(self, d_kan):
-        
+    def find_time_kanshi(self, birthday, d_kan):
+        """
+        ＜機能＞
+        birthday で与えられた生年月日の時干支を取得する
+        ＜入力＞
+          - birthday（datetime）：誕生日
+          - d_kan（int）：日干の番号
+        ＜出力＞
+          - t_kan（int）：時干の番号
+          - t_shi（int）：時支の番号
+        ＜異常検出＞
+        取得できなかった場合はエラーメッセージを出力して強制終了する
+        """
         time_span = [0, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 24]
-        
+
         for i in range(len(time_span) - 1):
-            
-            from_dt = dt(year = self.birthday.year, month = self.birthday.month, day = self.birthday.day,
-                         hour = time_span[i], minute = 0)
+
+            from_dt = datetime(year=birthday.year,
+                               month=birthday.month,
+                               day=birthday.day,
+                               hour=time_span[i],
+                               minute=0)
+
             if (i == 0) or (i == len(time_span)):
-                to_dt = from_dt + td(hours = 0, minutes = 59)
+                to_dt = from_dt + timedelta(hours=0, minutes=59)
             else:
-                to_dt = from_dt + td(hours = 1, minutes = 59)
-                
-            if from_dt <= self.birthday <= to_dt:
-                t_kan, t_shi = kd.time_kanshi[d_kan][i]
-                return t_kan, t_shi
+                to_dt = from_dt + timedelta(hours=1, minutes=59)
 
+            if from_dt <= birthday <= to_dt:
+                try:
+                    t_kan, t_shi = kd.time_kanshi[d_kan][i]
+                    return t_kan, t_shi
+                except IndexError:
+                    print('時干支の計算で例外が送出されました。')
+                    sys.exit(1)
 
-    def find_zokan(self, shi):
-        
-        p = self.is_setsuiri_month()
+        print('時干支を得られませんでした。')
+        sys.exit(1)
 
-        if p == 0:
-            setsuiri = dt(year = self.birthday.year, month = self.birthday.month, day = kd.setsuiri[self.birthday.month - 1], hour = 0, minute = 0)
-        else:
-            if self.birthday.month == 1:
-                setsuiri = dt(year = self.birthday.year - 1, month = 12, day = kd.setsuiri[11], hour = 0, minute = 0)
-            else:
-                setsuiri = dt(year = self.birthday.year, month = self.birthday.month - 1, day = kd.setsuiri[self.birthday.month - 2], hour = 0, minute = 0)
-        
+    def find_zokan(self, birthday, shi):
+        """
+        ＜機能＞
+        birthday で与えられた生年月日の shi に対応する蔵干を取得する
+        ＜入力＞
+          - birthday（datetime）：誕生日
+          - shi（int）：年支、月支、日支、時支の番号
+        ＜出力＞
+          - z_kan（int）：蔵干の番号
+        ＜異常検出＞
+        取得できなかった場合はエラーメッセージを出力して強制終了する
+        """
+
+        # 直近の節入り日時を取得する
+        p = self.is_setsuiri(birthday, birthday.month)
+        for s in kd.setsuiri:
+            if (s[0] == birthday.year) and (s[1] == birthday.month):
+                if s[1] + p <= 0:
+                    y = s[0] - 1
+                    m = 12
+                else:
+                    y = s[0]
+                    m = s[1] + p
+                setsuiri = datetime(year=y, month=m, day=s[2],
+                                    hour=s[3], minute=s[4])
+
+        # 蔵干が「午」の場合は例外
         if shi == 6:
-            delta1 = td(days = kd.zokan_time[shi][0][0], hours = kd.zokan_time[shi][0][1])
-            delta2 = td(days = kd.zokan_time[shi][1][0], hours = kd.zokan_time[shi][1][1])
+            delta1 = timedelta(
+                days=kd.zokan_time[6][0][0], hours=kd.zokan_time[6][0][1])
+            delta2 = timedelta(
+                days=kd.zokan_time[6][1][0], hours=kd.zokan_time[6][1][1])
         else:
-            delta = td(days = kd.zokan_time[shi][0], hours = kd.zokan_time[shi][1])
+            delta = timedelta(
+                days=kd.zokan_time[shi][0], hours=kd.zokan_time[shi][1])
 
-        if shi == 6:
-            if setsuiri + delta1 >= self.birthday:
-                zokan = kd.zokan[shi][0]
-            elif setsuiri + delta1 < self.birthday <= setsuiri + delta2:
-                zokan = kd.zokan[shi][1]
+        try:
+            if shi == 6:
+                if setsuiri + delta1 >= birthday:
+                    zokan = kd.zokan[6][0]
+                elif setsuiri + delta1 < birthday <= setsuiri + delta2:
+                    zokan = kd.zokan[6][1]
+                else:
+                    zokan = kd.zokan[6][2]
             else:
-                zokan = kd.zokan[shi][2]
-        else:
-            if setsuiri + delta >= self.birthday:
-                zokan = kd.zokan[shi][0]
-            else:
-                zokan = kd.zokan[shi][1]
-                
-        return zokan
-    
-        
+                if setsuiri + delta >= birthday:
+                    zokan = kd.zokan[shi][0]
+                else:
+                    zokan = kd.zokan[shi][1]
+            return zokan
+        except IndexError:
+            print('蔵干の計算で例外が送出されました。')
+            sys.exit(1)
+
+    def append_gogyo(self, tenkan, chishi):
+        """
+        五行（木火土金水）のそれぞれの数を得る
+        """
+        gogyo = [0] * 5
+        try:
+            for t in tenkan:
+                if t != -1:
+                    gogyo[kd.gogyo_kan[t]] += 1
+        except IndexError:
+            print('五行の計算で例外が送出されました。')
+            sys.exit(1)
+        try:
+            for c in chishi:
+                if c != -1:
+                    gogyo[kd.gogyo_shi[c]] += 1
+        except IndexError:
+            print('五行の計算で例外が送出されました。')
+            sys.exit(1)
+
+        return gogyo
+
+    def append_tsuhen(self, tenkan, zokan):
+        """
+        通変を得る
+        """
+        tsuhen = []
+        try:
+            for i in tenkan + zokan:
+                if i == -1:
+                    tsuhen.append(-1)
+                else:
+                    tsuhen.append(kd.kan_tsuhen[tenkan[2]].index(i))
+        except IndexError:
+            print('通変の計算で例外が送出されました。')
+            sys.exit(1)
+
+        return tsuhen
+
+    def append_twelve_fortune(self, tenkan, chishi):
+        """
+        十二運を得る
+        """
+        twelve_fortune = []
+        try:
+            for c in chishi:
+                if c == -1:
+                    twelve_fortune.append(-1)
+                else:
+                    twelve_fortune.append(kd.twelve_table[tenkan[2]][c])
+        except IndexError:
+            print('十二運の計算で例外が送出されました。')
+            sys.exit(1)
+
+        return twelve_fortune
+
     def build_meishiki(self):
-        
+        """
+        命式を組成する
+        """
+
         # 天干・地支を得る
-        y_kan, y_shi = self.find_year_kanshi()
-        m_kan, m_shi = self.find_month_kanshi(y_kan)
-        d_kan, d_shi = self.find_day_kanshi()
+        y_kan, y_shi = self.find_year_kanshi(self.birthday)
+        m_kan, m_shi = self.find_month_kanshi(self.birthday, y_kan)
+        d_kan, d_shi = self.find_day_kanshi(self.birthday)
         if self.t_flag:
-            t_kan, t_shi = self.find_time_kanshi(d_kan)
+            t_kan, t_shi = self.find_time_kanshi(self.birthday, d_kan)
         else:
             t_kan = -1
             t_shi = -1
 
         # 蔵干を得る
-        y_zkan = self.find_zokan(y_shi)
-        m_zkan = self.find_zokan(m_shi)
-        d_zkan = self.find_zokan(d_shi)
+        y_zkan = self.find_zokan(self.birthday, y_shi)
+        m_zkan = self.find_zokan(self.birthday, m_shi)
+        d_zkan = self.find_zokan(self.birthday, d_shi)
         if self.t_flag:
-            t_zkan = self.find_zokan(t_shi)
+            t_zkan = self.find_zokan(self.birthday, t_shi)
         else:
             t_zkan = -1
-        
+
         tenkan = [y_kan, m_kan, d_kan, t_kan]
         chishi = [y_shi, m_shi, d_shi, t_shi]
         zokan = [y_zkan, m_zkan, d_zkan, t_zkan]
-        
+
         nenchu = [y_kan, y_shi, y_zkan]
         getchu = [m_kan, m_shi, m_zkan]
         nitchu = [d_kan, d_shi, d_zkan]
-        jichu  = [t_kan, t_shi, t_zkan]
+        jichu = [t_kan, t_shi, t_zkan]
         nikkan = d_kan
-        
+
         # 五行（木火土金水）のそれぞれの数を得る
-        gogyo = [0] * 5
-        for t in tenkan:
-            if t != -1:
-                gogyo[kd.gogyo_kan[t]] += 1
-        for s in chishi:
-            if s != -1:
-                gogyo[kd.gogyo_shi[s]] += 1
+        gogyo = self.append_gogyo(tenkan, chishi)
 
         # 通変を得る
-        tsuhen = []
-        for i in tenkan + zokan:
-            if i == -1:
-                tsuhen.append(-1)
-            else:
-                tsuhen.append(kd.kan_tsuhen[tenkan[2]].index(i))
+        tsuhen = self.append_tsuhen(tenkan, zokan)
 
         # 十二運を得る
-        twelve_fortune = []
-        for i in chishi:
-            if i == -1:
-                twelve_fortune.append(-1)
-            else:
-                twelve_fortune.append(kd.twelve_table[tenkan[2]][i])
+        twelve_fortune = self.append_twelve_fortune(tenkan, chishi)
 
         # 調候を得る
-        choko = kd.choko[d_kan][self.birthday.month - 1]
+        try:
+            choko = kd.choko[d_kan][self.birthday.month - 1]
+        except IndexError:
+            print('調候の計算で例外が送出されました。')
+            sys.exit(1)
 
         # 空亡を得る
-        d = self.birthday.day + kd.kisu_table[(self.birthday.year - 1926) % 80][self.birthday.month - 1] - 1
-        if d >= 60:
-            d -= 60  # d が 60 を超えたら 60 を引く
-        kubo = kd.kubo[d // 10]
-        
+        try:
+            d = self.birthday.day + \
+                kd.kisu_table[(self.birthday.year - 1926) %
+                              80][self.birthday.month - 1] - 1
+            if d >= 60:
+                d -= 60  # d が 60 を超えたら 60 を引く
+            kubo = kd.kubo[d // 10]
+        except IndexError:
+            print('空亡の計算で例外が送出されました。')
+            sys.exit(1)
+
         # クラス変数 meishiki に情報を追加する
         self.meishiki.update({"tenkan": tenkan})
         self.meishiki.update({"chishi": chishi})
-        self.meishiki.update({"zokan" : zokan})
+        self.meishiki.update({"zokan": zokan})
         self.meishiki.update({"nenchu": nenchu})
         self.meishiki.update({"getchu": getchu})
         self.meishiki.update({"nitchu": nitchu})
-        self.meishiki.update({"jichu" : jichu})
-        self.meishiki.update({"nikkan" : nikkan})
-        self.meishiki.update({"gogyo" : gogyo})
+        self.meishiki.update({"jichu": jichu})
+        self.meishiki.update({"nikkan": nikkan})
+        self.meishiki.update({"gogyo": gogyo})
         self.meishiki.update({"tsuhen": tsuhen})
         self.meishiki.update({"twelve_fortune": twelve_fortune})
         self.meishiki.update({"choko": choko})
         self.meishiki.update({"kubo": kubo})
-
-
-
-                

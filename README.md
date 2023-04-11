@@ -11,9 +11,25 @@
 ![生成された命式](https://user-images.githubusercontent.com/7956282/223111152-37f4f841-4d0f-46e3-a11e-e627e1bd8578.png)
 
 
+# 動作を確認した環境
+
+- macOS Ventura 13.3.1
+- Python 3.11.2
+
 # 使い方
 ```
 $ python -m pip install -r requirement.txt
 $ python meshiki_gui.py
 ```
 
+# Windows で exe 化する場合の手順
+
+下記のコマンドで customtkinter のインストールパスを確認します。
+```
+$ pip show customtkinter
+```
+次に、以下のコマンドで exe 化します。
+```
+$ pyinstaller --onefile --noconsole --add-data "<確認したインストールパス>\customtkinter;customtkinter\" meishiki_gui.py
+```
+うまく命式が出力されない場合は、```--noconsole``` オプションを外してエラーメッセージを確認しましょう。

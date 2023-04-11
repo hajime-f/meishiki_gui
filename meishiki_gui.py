@@ -33,7 +33,7 @@ ctk.set_default_color_theme("blue")
 
 app = ctk.CTk()
 app.geometry("895x160")
-app.title("命式生成プログラム Ver.1.0")
+app.title("命式生成プログラム Ver.1.1")
 app.resizable(False, False)
 
 year_dict = {'西暦': ['1926年', '1927年', '1928年', '1929年', '1930年', '1931年',

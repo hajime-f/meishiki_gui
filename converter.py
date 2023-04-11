@@ -47,8 +47,10 @@ def date_converter(text):
         if date.group("era") == era:
             if date.group("year") == "元":
                 year = start_year
+                break
             else:
                 year = start_year + int(date.group("year")) - 1
+                break
 
     # date型に変換して返す
     return datetime.date(year, int(date.group("month")), int(date.group("day")))

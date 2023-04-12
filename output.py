@@ -27,7 +27,7 @@ def output_html(meishiki, unsei):
         else:
             birthday_str = meishiki.birthday.strftime(
                 f'{wareki}%-m月%-d日 -時-分生')
-        sex_str = '男命' if meishiki.sex == 0 else '女命'
+    sex_str = '男命' if meishiki.sex == 0 else '女命'
 
     daiun = unsei.unsei["daiun"]
     nenun = unsei.unsei["nenun"]

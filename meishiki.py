@@ -263,6 +263,33 @@ class Meishiki:
 
         return twelve_fortune
 
+    def append_choko(self, birthday, d_kan):
+        """
+        調候を得る
+        """
+        try:
+            choko = kd.choko[d_kan][birthday.month - 1]
+        except IndexError:
+            print('調候の計算で例外が送出されました。')
+            sys.exit(1)
+
+        return choko
+
+    def append_kubo(self, birthday):
+
+        try:
+            d = birthday.day + \
+                kd.kisu_table[(birthday.year - 1926) %
+                              80][birthday.month - 1] - 1
+            if d >= 60:
+                d -= 60  # d が 60 を超えたら 60 を引く
+            kubo = kd.kubo[d // 10]
+        except IndexError:
+            print('空亡の計算で例外が送出されました。')
+            sys.exit(1)
+
+        return kubo
+
     def build_meishiki(self):
         """
         命式を組成する
@@ -307,23 +334,10 @@ class Meishiki:
         twelve_fortune = self.append_twelve_fortune(tenkan, chishi)
 
         # 調候を得る
-        try:
-            choko = kd.choko[d_kan][self.birthday.month - 1]
-        except IndexError:
-            print('調候の計算で例外が送出されました。')
-            sys.exit(1)
+        choko = self.append_choko(self.birthday, d_kan)
 
         # 空亡を得る
-        try:
-            d = self.birthday.day + \
-                kd.kisu_table[(self.birthday.year - 1926) %
-                              80][self.birthday.month - 1] - 1
-            if d >= 60:
-                d -= 60  # d が 60 を超えたら 60 を引く
-            kubo = kd.kubo[d // 10]
-        except IndexError:
-            print('空亡の計算で例外が送出されました。')
-            sys.exit(1)
+        kubo = self.append_kubo(self.birthday)
 
         # クラス変数 meishiki に情報を追加する
         self.meishiki.update({"tenkan": tenkan})

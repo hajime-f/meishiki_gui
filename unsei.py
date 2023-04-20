@@ -92,15 +92,43 @@ class Unsei:
         print('干支が見つかりませんでした。')
         sys.exit(1)
 
+    def is_kango(self, tenkan_zokan, kan):
+
+        for i, k in enumerate(tenkan_zokan):
+            if k == -1:
+                continue
+            if k == kd.kango[kan]:
+                return i
+        return -1
+
+    def is_shigo(self, chishi, shi):
+
+        for i, s in enumerate(chishi):
+            if s == -1:
+                continue
+            if s == kd.shigo[shi]:
+                return i
+        return -1
+
+    def is_hogo(self, chishi, shi):
+
+        chishi_p = chishi + shi
+
+        for i, h in enumerate(kd.hogo):
+            if (h[0][0] in chishi_p) and (h[0][1] in chishi_p) and (h[0][2] in chishi_p):
+                return i
+        return -1
+
     def append_daiun(self):
         """
         大運を命式に追加する
         """
         daiun = []
         year_ratio_list = self.convert_year_ratio(self.birthday)
+        meishiki = self.meishiki.meishiki
 
         # 順運か逆運か？
-        if self.is_junun_gyakuun(self.meishiki.sex, self.meishiki.meishiki["nenchu"][0]):
+        if self.is_junun_gyakuun(self.meishiki.sex, meishiki["nenchu"][0]):
             ry = year_ratio_list[1]  # 次の節入日が立運の起算日
             p = 1                    # 六十干支表を順にたどる
         else:
@@ -108,16 +136,40 @@ class Unsei:
             p = -1                   # 六十干支表を逆にたどる
 
         idx = self.find_kanshi_idx(
-            self.meishiki.meishiki["getchu"][0], self.meishiki.meishiki["getchu"][1], p)
+            meishiki["getchu"][0], meishiki["getchu"][1], p)
 
         for n in list(range(10, 140, 10)):
 
             if idx >= 60:
                 idx = 0
             kan, shi = kd.sixty_kanshi[idx]
-            tsuhen = kd.kan_tsuhen[self.meishiki.meishiki["nikkan"]].index(kan)
+            tsuhen = kd.kan_tsuhen[meishiki["nikkan"]].index(kan)
 
-            daiun.append([ry, kan, shi, tsuhen])
+            kango = self.is_kango(
+                meishiki["tenkan"] + meishiki["zokan"], kan)  # 干合
+            shigo = self.is_shigo(meishiki["chishi"], shi)  # 支合
+
+            if not meishiki["hogo"]:
+                hogo = self.is_hogo(meishiki["chishi"], shi)    # 方合
+            else:
+                hogo = -1
+
+            sango = is_sango(meishiki["chishi"], shi)  # 三合
+            if sango == -1:
+                hankai = is_hankai(meishiki["chishi"], shi)  # 半会
+            else:
+                hankai = -1
+            tc = is_tensen_chichu(meishiki.nitchu[1], tsuhen, shi)  # 天戦地冲
+            if tc == -1:
+                chu = is_chu(meishiki.chishi, shi)  # 冲
+            else:
+                chu = -1
+            kei = is_kei(meishiki.chishi, shi)  # 刑
+            gai = is_gai(meishiki.chishi, shi)  # 害
+
+            daiun.append([ry, kan, shi, tsuhen, kango, shigo,
+                         hogo, sango, hankai, tc, chu, kei, gai])
+
             ry += 10
             idx += p
 

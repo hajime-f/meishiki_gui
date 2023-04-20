@@ -35,8 +35,8 @@ class Meishiki:
                                     hour=s[3], minute=s[4])
                 if setsuiri < birthday:
                     return 0    # 節入りしている
-                else:
-                    return -1   # 節入りしていない
+
+                return -1   # 節入りしていない
 
         print('節入りを判定できませんでした。')
         sys.exit(1)
@@ -229,6 +229,27 @@ class Meishiki:
 
         return gogyo
 
+    def append_inyo(self, tenkan, chishi):
+        """
+        陰陽のそれぞれの数を得る
+        """
+        inyo = [0] * 2
+        for k in tenkan:
+            inyo[k % 2] += 1
+        for s in chishi:
+            inyo[s % 2] += 1
+        return inyo
+
+    def append_getsurei(self, d_kan, m_shi):
+        """
+        月令を得る
+        """
+        if m_shi in kd.getsurei_ou[d_kan]:
+            return 1
+        if m_shi in kd.getsurei_sou[d_kan]:
+            return 2
+        return 0
+
     def append_tsuhen(self, tenkan, zokan):
         """
         通変を得る
@@ -263,6 +284,142 @@ class Meishiki:
 
         return twelve_fortune
 
+    def append_kango(self, tenkan_zokan):
+        """
+        ＜機能＞
+        干合を命式に追加する
+        ＜入力＞
+          - 天干＋蔵干
+        ＜出力＞
+          - 干合のリスト
+            [[干合する干１, 干１の場所（0〜7）], [干合する干２, 干２の場所], 変化する五行]
+        """
+        kango = []
+        for i, tz1 in enumerate(tenkan_zokan):
+            if tz1 == -1:
+                continue
+            for j in list(range(i, len(tenkan_zokan))):
+                if kd.kango[tz1] == tenkan_zokan[j] and i != j:
+                    kango.append(
+                        [[tz1, i], [tenkan_zokan[j], j], kd.kango_henka[tz1]])
+        return kango
+
+    def append_shigo(self, chishi):
+        """
+        ＜機能＞
+        支合を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 支合のリスト
+            [[支合する支１, 支１の場所（0〜3）], [支合する支２, 支２の場所]]
+        """
+        shigo = []
+        for i, s in enumerate(chishi):
+            if s == -1:
+                continue
+            for j in list(range(i, len(chishi))):
+                if kd.shigo[s] == chishi[j] and i != j:
+                    shigo.append([[s, i], [kd.shigo[s], j]])
+        return shigo
+
+    def append_hogo(self, chishi):
+        """
+        ＜機能＞
+        方合を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 方合のリスト
+        """
+        for i, h in enumerate(kd.hogo):
+            if (h[0][0] in chishi) and (h[0][1] in chishi) and (h[0][2] in chishi):
+                return kd.hogo[i]
+        return []
+
+    def append_sango(self, chishi):
+        """
+        ＜機能＞
+        三合を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 三合のリスト
+        """
+        for i, s in enumerate(kd.sango):
+            if (s[0][0] in chishi) and (s[0][1] in chishi) and (s[0][2] in chishi):
+                return kd.sango[i]
+        return []
+
+    def append_hankai(self, chishi):
+        """
+        ＜機能＞
+        半会を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 半会のリスト
+        """
+        hankai = []
+        for h in kd.hankai:
+            if (h[0][0] in chishi) and (h[0][1] in chishi):
+                hankai.append(h)
+        return hankai
+
+    def append_hitsuchu(self, chishi):
+        """
+        ＜機能＞
+        七冲を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 七冲のリスト
+        """
+        hitsuchu = []
+        for i, s in enumerate(chishi):
+            if s == -1:
+                continue
+            for j in list(range(i, len(chishi))):
+                if kd.hitsuchu[s] == chishi[j] and i != j:
+                    hitsuchu.append([[s, i], [kd.hitsuchu[s], j]])
+        return hitsuchu
+
+    def append_kei(self, chishi):
+        """
+        ＜機能＞
+        刑を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 刑のリスト
+        """
+        kei = []
+        for i, s in enumerate(chishi):
+            if s == -1:
+                continue
+            for j in list(range(0, len(chishi))):
+                if kd.kei[s] == chishi[j] and i != j:
+                    kei.append([[s, i], [kd.kei[s], j]])
+        return kei
+
+    def append_gai(self, chishi):
+        """
+        ＜機能＞
+        害を命式に追加する
+        ＜入力＞
+          - 地支
+        ＜出力＞
+          - 害のリスト
+        """
+        gai = []
+        for i, s in enumerate(chishi):
+            if s == -1:
+                continue
+            for j in list(range(i, len(chishi))):
+                if kd.gai[s] == chishi[j] and i != j:
+                    gai.append([[s, i], [kd.gai[s], j]])
+        return gai
+
     def append_choko(self, birthday, d_kan):
         """
         調候を得る
@@ -276,7 +433,9 @@ class Meishiki:
         return choko
 
     def append_kubo(self, birthday):
-
+        """
+        空亡を得る
+        """
         try:
             d = birthday.day + \
                 kd.kisu_table[(birthday.year - 1926) %
@@ -289,6 +448,34 @@ class Meishiki:
             sys.exit(1)
 
         return kubo
+
+    def append_youjin(self, d_kan, d_shi):
+        """
+        陽刃を得る
+        """
+        if d_kan == 2 and d_shi == 6:    # 丙午
+            return 1
+        elif d_kan == 4 and d_shi == 6:  # 戊午
+            return 1
+        elif d_kan == 8 and d_shi == 0:  # 壬子
+            return 1
+        else:
+            return 0
+
+    def append_kaigou(self, d_kan, d_shi):
+        """
+        魁罡を得る
+        """
+        if d_kan == 4 and d_shi == 10:   # 戊戌
+            return 1
+        elif d_kan == 6 and d_shi == 10:  # 庚戌
+            return 1
+        elif d_kan == 6 and d_shi == 4:  # 庚辰
+            return 1
+        elif d_kan == 8 and d_shi == 4:  # 壬辰
+            return 1
+        else:
+            return 0
 
     def build_meishiki(self):
         """
@@ -327,17 +514,46 @@ class Meishiki:
         # 五行（木火土金水）のそれぞれの数を得る
         gogyo = self.append_gogyo(tenkan, chishi)
 
+        # 陰陽のそれぞれの数を得る
+        inyo = self.append_inyo(tenkan, chishi)
+
+        # 月令を得る
+        getsurei = self.append_getsurei(d_kan, m_shi)
+
         # 通変を得る
         tsuhen = self.append_tsuhen(tenkan, zokan)
 
         # 十二運を得る
         twelve_fortune = self.append_twelve_fortune(tenkan, chishi)
 
+        # 干合を得る
+        kango = self.append_kango(tenkan + zokan)
+
+        # 支合を得る
+        shigo = self.append_shigo(chishi)
+
+        # 方合・三合・半会を得る
+        hogo = self.append_hogo(chishi)
+        sango = self.append_sango(chishi)
+        if not sango:
+            hankai = self.append_hankai(chishi)
+        else:
+            hankai = []
+
+        # 七冲・刑・害を得る
+        hitsuchu = self.append_hitsuchu(chishi)
+        kei = self.append_kei(chishi)
+        gai = self.append_gai(chishi)
+
         # 調候を得る
         choko = self.append_choko(self.birthday, d_kan)
 
         # 空亡を得る
         kubo = self.append_kubo(self.birthday)
+
+        # 陽刃・魁罡を得る
+        youjin = self.append_youjin(d_kan, d_shi)
+        kaigou = self.append_kaigou(d_kan, d_shi)
 
         # クラス変数 meishiki に情報を追加する
         self.meishiki.update({"tenkan": tenkan})
@@ -349,7 +565,19 @@ class Meishiki:
         self.meishiki.update({"jichu": jichu})
         self.meishiki.update({"nikkan": nikkan})
         self.meishiki.update({"gogyo": gogyo})
+        self.meishiki.update({"inyo": inyo})
+        self.meishiki.update({"getsurei": getsurei})
         self.meishiki.update({"tsuhen": tsuhen})
         self.meishiki.update({"twelve_fortune": twelve_fortune})
+        self.meishiki.update({"kango": kango})
+        self.meishiki.update({"shigo": shigo})
+        self.meishiki.update({"hogo": hogo})
+        self.meishiki.update({"sango": sango})
+        self.meishiki.update({"hankai": hankai})
+        self.meishiki.update({"hitsuchu": hitsuchu})
+        self.meishiki.update({"kei": kei})
+        self.meishiki.update({"gai": gai})
         self.meishiki.update({"choko": choko})
         self.meishiki.update({"kubo": kubo})
+        self.meishiki.update({"youjin": youjin})
+        self.meishiki.update({"kaigou": kaigou})

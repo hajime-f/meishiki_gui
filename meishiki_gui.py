@@ -9,7 +9,7 @@ import customtkinter as ctk
 
 from converter import date_converter, time_converter
 from meishiki import Meishiki
-from output import output_html
+from output import output_html, output_stdio
 from unsei import Unsei
 
 
@@ -26,6 +26,8 @@ def main(birthday, t_flag, sex):
     file_name = output_html(meishiki, unsei)
     cwd = os.getcwd()
     webbrowser.open('file://' + cwd + '/' + file_name)
+
+    output_stdio(meishiki, unsei)
 
 
 ctk.set_appearance_mode("system")

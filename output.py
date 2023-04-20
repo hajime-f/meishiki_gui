@@ -7,7 +7,9 @@ import kanshi_data as kd
 
 
 def output_html(meishiki, unsei):
-
+    """
+    HTMLファイルを出力する関数
+    """
     env = Environment(loader=FileSystemLoader('html/', encoding='utf8'))
     template = env.get_template('template.html')
 
@@ -127,3 +129,221 @@ def output_html(meishiki, unsei):
         f.write(result)
 
     return file_name
+
+
+def output_stdio(meishiki, unsei):
+    """
+    標準出力に出力する
+    """
+    print('＜五行＞')
+    for i, g in enumerate(meishiki.meishiki["gogyo"]):
+        print(kd.gogyo[i] + '：' + str(g))
+
+    print()
+
+    print('＜陰陽のバランス＞')
+    print('陰：' + str(meishiki.meishiki["inyo"][1]))
+    print('陽：' + str(meishiki.meishiki["inyo"][0]))
+
+    print()
+
+    print('＜月令＞')
+    print(kd.getsurei[meishiki.meishiki["getsurei"]])
+
+    print()
+
+    print('＜干合＞')
+    if not meishiki.meishiki["kango"]:
+        print('干合なし')
+    else:
+        for k in meishiki.meishiki["kango"]:
+            b1 = kd.kango_chu[k[0][1]]   # 干１の場所
+            k1 = kd.kan[k[0][0]]         # 干１
+            b2 = kd.kango_chu[k[1][1]]   # 干２の場所
+            k2 = kd.kan[k[1][0]]         # 干２
+            print(b1 + 'の「' + k1 + '」と' + b2 + 'の「' + k2 + '」とが干合')
+
+    print()
+
+    print('＜支合＞')
+    if not meishiki.meishiki["shigo"]:
+        print('支合なし')
+    else:
+        for s in meishiki.meishiki["shigo"]:
+            b1 = kd.shigo_chu[s[0][1]]   # 支１の場所
+            k1 = kd.shi[s[0][0]]         # 支１
+            b2 = kd.shigo_chu[s[1][1]]   # 支２の場所
+            k2 = kd.shi[s[1][0]]         # 支２
+            print(b1 + 'の「' + k1 + '」と' + b2 + 'の「' + k2 + '」とが支合')
+
+    print()
+
+    print('＜三合会局＞')
+    if not meishiki.meishiki["sango"]:
+        print('三合会局なし')
+    else:
+        sango = meishiki.meishiki["sango"]
+        print(kd.shi[sango[0][0]] + ', ' + kd.shi[sango[0][1]] +
+              ', ' + kd.shi[sango[0][2]] + 'の三合' + kd.gogyo[sango[1]] + '局')
+
+    print()
+
+    print('＜半会＞')
+    if not meishiki.meishiki["hankai"]:
+        print('半会なし')
+    else:
+        hankai = meishiki.meishiki["hankai"]
+        for h in hankai:
+            print(kd.shi[h[0][0]] + ', ' + kd.shi[h[0][1]] +
+                  'が' + kd.gogyo[h[2]] + '半会')
+
+    print()
+
+    print('＜方合＞')
+    if not meishiki.meishiki["hogo"]:
+        print('方合なし')
+    else:
+        hogo = meishiki.meishiki["hogo"]
+        print(kd.shi[hogo[0][0]] + ', ' + kd.shi[hogo[0][1]] +
+              ', ' + kd.shi[hogo[0][2]] + 'で' + kd.gogyo[hogo[1]] + '方合')
+
+    print()
+
+    print('＜空亡＞')
+    print(kd.shi[meishiki.meishiki["kubo"][0]] +
+          kd.shi[meishiki.meishiki["kubo"][1]])
+
+    print()
+
+    print('＜七冲＞')
+    if not meishiki.meishiki["hitsuchu"]:
+        print('七冲なし')
+    else:
+        for h in meishiki.meishiki["hitsuchu"]:
+            b1 = kd.shigo_chu[h[0][1]]   # 支１の場所
+            k1 = kd.shi[h[0][0]]         # 支１
+            b2 = kd.shigo_chu[h[1][1]]   # 支２の場所
+            k2 = kd.shi[h[1][0]]         # 支２
+            print(b1 + 'の「' + k1 + '」が' + b2 + 'の「' + k2 + '」を冲する')
+
+    print()
+
+    print('＜刑＞')
+    if not meishiki.meishiki["kei"]:
+        print('刑なし')
+    else:
+        for k in meishiki.meishiki["kei"]:
+            b1 = kd.shigo_chu[k[0][1]]   # 支１の場所
+            k1 = kd.shi[k[0][0]]         # 支１
+            b2 = kd.shigo_chu[k[1][1]]   # 支２の場所
+            k2 = kd.shi[k[1][0]]         # 支２
+            print(b1 + 'の「' + k1 + '」が、' + b2 + 'の「' + k2 + '」を刑する')
+
+    print()
+
+    print('＜害＞')
+    if not meishiki.meishiki["gai"]:
+        print('害なし')
+    else:
+        for g in meishiki.meishiki["gai"]:
+            b1 = kd.shigo_chu[g[0][1]]   # 支１の場所
+            k1 = kd.shi[g[0][0]]         # 支１
+            b2 = kd.shigo_chu[g[1][1]]   # 支２の場所
+            k2 = kd.shi[g[1][0]]         # 支２
+            print(b1 + 'の「' + k1 + '」と' + b2 + 'の「' + k2 + '」とが害')
+
+    print()
+
+    print('＜特記＞')
+    if not meishiki.meishiki["youjin"] and not meishiki.meishiki["kaigou"]:
+        print('特記なし')
+    else:
+        if meishiki.meishiki["youjin"]:
+            print('陽刃')
+        if meishiki.meishiki["kaigou"]:
+            print('魁罡')
+
+    daiun = unsei.unsei["daiun"]
+    nenun = unsei.unsei["nenun"]
+
+    ry = daiun[0][0]
+    d_idx = 0
+    year = meishiki.birthday.year + ry
+
+    for n, nen in enumerate(nenun):
+
+        if (ry == 10) and (nen[0] != ry) and (nen[0] % 10 == 0):
+            d_idx += 1
+        if (ry != 10) and (nen[0] != ry) and (nen[0] % 10 == ry):
+            d_idx += 1
+
+        if nen[0] == daiun[d_idx][0]:
+            print()
+            d_kan = kd.kan[daiun[d_idx][1]]  # 大運の干
+            d_shi = kd.shi[daiun[d_idx][2]]  # 大運の支
+            d_tsuhen = kd.tsuhen[daiun[d_idx][3]]  # 大運の通変
+            cont = ''.join([d_kan, d_shi]) + ' (' + d_tsuhen + ')： '
+            if daiun[d_idx][4] != -1:
+                cont += '干合, '
+            if daiun[d_idx][5] != -1:
+                cont += '支合, '
+            if daiun[d_idx][6] != -1:
+                cont += kd.gogyo[kd.hogo[daiun[d_idx][6]][1]] + '方合, '
+            if daiun[d_idx][7] != -1:
+                cont += '三合' + kd.gogyo[kd.sango[daiun[d_idx][7]][1]] + '局, '
+            if daiun[d_idx][8] != -1:
+                cont += kd.gogyo[kd.hankai[daiun[d_idx][8]][2]] + '半会, '
+            if daiun[d_idx][9] != -1:
+                cont += '天戦地冲, '
+            if daiun[d_idx][10] != -1:
+                cont += '冲, '
+            if daiun[d_idx][11] != -1:
+                cont += '刑, '
+            if daiun[d_idx][12] != -1:
+                cont += '害, '
+            else:
+                cont = cont[:len(cont) - 2]
+            print(cont)
+            print('======')
+
+        wareki = kd.convert_to_wareki(
+            dt(year=year, month=meishiki.birthday.month, day=meishiki.birthday.day))
+        if len(str(nen[0])) == 1:
+            age = '  ' + str(nen[0])
+        elif len(str(nen[0])) == 2:
+            age = ' ' + str(nen[0])
+        else:
+            age = str(nen[0])
+        cont = str(year) + '年（' + wareki + '）| ' + age + '歳 | '
+
+        n_kan = kd.kan[nen[1]]  # 年運の干
+        n_shi = kd.shi[nen[2]]  # 年運の支
+        n_tsuhen = kd.tsuhen[nen[3]]  # 年運の通変
+        cont += ''.join([n_kan, n_shi]) + ' (' + n_tsuhen + ') |  '
+        if nen[4] != -1:
+            cont += '干合, '
+        if nen[5] != -1:
+            cont += '支合, '
+        if nen[6] != -1:
+            cont += kd.gogyo[kd.hogo[nen[6]][1]] + '方合, '
+        if nen[7] != -1:
+            cont += '三合' + kd.gogyo[kd.sango[nen[7]][1]] + '局, '
+        if nen[8] != -1:
+            cont += kd.gogyo[kd.hankai[nen[8]][2]] + '半会, '
+        if nen[9] != -1:
+            cont += '天戦地冲, '
+        if nen[10] != -1:
+            cont += '冲, '
+        if nen[11] != -1:
+            cont += '刑, '
+        if nen[12] != -1:
+            cont += '害, '
+        if nen[13] != -1:
+            cont += '官殺混雑'
+        else:
+            cont = cont[:len(cont) - 2]
+        print(cont)
+        # breakpoint()
+        year += 1
+
+    return 1

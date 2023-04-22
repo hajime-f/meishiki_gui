@@ -300,7 +300,7 @@ def output_stdio(meishiki, unsei):
             if daiun[d_idx][11] != -1:
                 cont += '刑, '
             if daiun[d_idx][12] != -1:
-                cont += '害, '
+                cont += '害'
             else:
                 cont = cont[:len(cont) - 2]
             print(cont)
@@ -343,7 +343,6 @@ def output_stdio(meishiki, unsei):
         else:
             cont = cont[:len(cont) - 2]
         print(cont)
-        # breakpoint()
         year += 1
 
     return 1

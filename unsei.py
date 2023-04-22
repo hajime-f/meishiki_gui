@@ -112,11 +112,132 @@ class Unsei:
 
     def is_hogo(self, chishi, shi):
 
-        chishi_p = chishi + shi
+        chishi_p = chishi + [shi]
 
         for i, h in enumerate(kd.hogo):
             if (h[0][0] in chishi_p) and (h[0][1] in chishi_p) and (h[0][2] in chishi_p):
                 return i
+        return -1
+
+    def is_sango(self, chishi, shi):
+
+        chishi_p = chishi + [shi]
+
+        for i, s in enumerate(kd.sango):
+            if (s[0][0] in chishi_p) and (s[0][1] in chishi_p) and (s[0][2] in chishi_p):
+                return i
+        return -1
+
+    def is_hankai(self, chishi, shi):
+
+        for i, h in enumerate(kd.hankai):
+            if ((h[0][0] in chishi) and (h[0][1] in [shi])) or ((h[0][0] in [shi]) and (h[0][1] in chishi)):
+                return i
+        return -1
+
+    def is_tensen_chichu(self, nisshi, tsuhen, shi):
+
+        if (shi == kd.hitsuchu_rev[nisshi]) and (tsuhen == 6):
+            return 1
+        return -1
+
+    def is_chu(self, chishi, shi):
+
+        ch = [chishi[0]] + [-1] + [chishi[2]] + [chishi[3]]
+        for i, s in enumerate(ch):
+            if s == kd.hitsuchu_nodir[shi]:
+                return i
+        return -1
+
+    def is_kei(self, chishi, shi):
+
+        for i, s in enumerate(chishi):
+            if s == kd.kei[shi]:
+                return i
+        return -1
+
+    def is_gai(self, chishi, shi):
+
+        for i, s in enumerate(chishi):
+            if s == kd.gai[shi]:
+                return i
+        return -1
+
+    def is_kango_y(self, tenkan_zokan, d_kan, kan):
+
+        for i, k in enumerate(tenkan_zokan):
+            if k == kd.kango[kan]:
+                return i
+        if d_kan == kd.kango[kan]:
+            return len(tenkan_zokan)
+        return -1
+
+    def is_shigo_y(self, chishi, d_shi, shi):
+
+        for i, s in enumerate(chishi):
+            if s == kd.shigo[shi]:
+                return i
+        if d_shi == kd.shigo[shi]:
+            return len(chishi)
+        return -1
+
+    def is_hogo_y(self, chishi, d_shi, shi, flag1):
+
+        for i, c in enumerate(chishi):
+            hogo = [c, d_shi, shi]
+            for j, h in enumerate(kd.hogo):
+                if (h[0][0] in hogo) and (h[0][1] in hogo) and (h[0][2] in hogo):
+                    return j
+        if flag1:
+            return self.is_hogo(chishi, shi)
+        return -1
+
+    def is_sango_y(self, chishi, d_shi, shi, flag2):
+
+        for i, c in enumerate(chishi):
+            sango = [c, d_shi, shi]
+            for j, s in enumerate(kd.sango):
+                if (s[0][0] in sango) and (s[0][1] in sango) and (s[0][2] in sango):
+                    return j
+        if flag2:
+            return self.is_sango(chishi, shi)
+        return -1
+
+    def is_hankai_y(self, chishi, d_shi, shi):
+
+        for i, h in enumerate(kd.hankai):
+            if ((h[0][0] in chishi) and (h[0][1] in [shi])) or ((h[0][0] in [shi]) and (h[0][1] in chishi)) or ((h[0][0] in [shi]) and (h[0][1] in [d_shi])) or ((h[0][0] in [d_shi]) and (h[0][1] in [shi])):
+                return i
+        return -1
+
+    def is_chu_y(self, chishi, d_shi, shi):
+
+        ch = chishi + [d_shi]
+        for i, s in enumerate(ch):
+            if s == kd.hitsuchu_nodir[shi]:
+                return i
+        return -1
+
+    def is_kei_y(self, chishi, d_shi, shi):
+
+        ch = chishi + [d_shi]
+        for i, s in enumerate(ch):
+            if s == kd.kei[shi]:
+                return i
+        return -1
+
+    def is_gai_y(self, chishi, d_shi, shi):
+
+        ch = chishi + [d_shi]
+        for i, s in enumerate(ch):
+            if s == kd.gai[shi]:
+                return i
+        return -1
+
+    def is_kansatsu(self, d_tsuhen, n_tsuhen):
+
+        if (d_tsuhen == 6 and n_tsuhen == 7) or (d_tsuhen == 7 and n_tsuhen == 6):
+            return 1
         return -1
 
     def append_daiun(self):
@@ -154,18 +275,25 @@ class Unsei:
             else:
                 hogo = -1
 
-            sango = is_sango(meishiki["chishi"], shi)  # 三合
+            if not meishiki["sango"]:
+                sango = self.is_sango(meishiki["chishi"], shi)  # 三合
+            else:
+                sango = -1
+
             if sango == -1:
-                hankai = is_hankai(meishiki["chishi"], shi)  # 半会
+                hankai = self.is_hankai(meishiki["chishi"], shi)  # 半会
             else:
                 hankai = -1
-            tc = is_tensen_chichu(meishiki.nitchu[1], tsuhen, shi)  # 天戦地冲
+
+            tc = self.is_tensen_chichu(
+                meishiki["nitchu"][1], tsuhen, shi)  # 天戦地冲
             if tc == -1:
-                chu = is_chu(meishiki.chishi, shi)  # 冲
+                chu = self.is_chu(meishiki["chishi"], shi)  # 冲
             else:
                 chu = -1
-            kei = is_kei(meishiki.chishi, shi)  # 刑
-            gai = is_gai(meishiki.chishi, shi)  # 害
+
+            kei = self.is_kei(meishiki["chishi"], shi)  # 刑
+            gai = self.is_gai(meishiki["chishi"], shi)  # 害
 
             daiun.append([ry, kan, shi, tsuhen, kango, shigo,
                          hogo, sango, hankai, tc, chu, kei, gai])
@@ -182,13 +310,72 @@ class Unsei:
         nenun = []
         idx = (self.meishiki.birthday.year - 3) % 60 - 1
         ry = daiun[0][0]
+        d_idx = 0
+
+        meishiki = self.meishiki.meishiki
 
         for n in list(range(0, 120)):
             kan, shi = kd.sixty_kanshi[idx]
             tsuhen = kd.kan_tsuhen[self.meishiki.meishiki["nikkan"]].index(kan)
 
+            if (n != ry) and (n % 10 == ry):
+                d_idx += 1
+
             if n >= ry:
-                nenun.append([n, kan, shi, tsuhen])
+
+                d_kan = daiun[d_idx][1]
+                d_shi = daiun[d_idx][2]
+
+                kango = self.is_kango_y(
+                    meishiki["tenkan"] + meishiki["zokan"], d_kan, kan)  # 干合
+                shigo = self.is_shigo_y(meishiki["chishi"], d_shi, shi)  # 支合
+
+                if not meishiki["hogo"]:
+                    flag1 = True
+                else:
+                    flag1 = False
+
+                if daiun[d_idx][6] == -1:
+                    hogo = self.is_hogo_y(
+                        meishiki["chishi"], d_shi, shi, flag1)    # 方号
+                else:
+                    hogo = -1
+
+                if not meishiki["sango"]:
+                    flag2 = True
+                else:
+                    flag2 = False
+
+                if daiun[d_idx][7] == -1:
+                    sango = self.is_sango_y(
+                        meishiki["chishi"], d_shi, shi, flag2)  # 三合
+                else:
+                    sango = -1
+
+                if sango == -1:
+                    hankai = self.is_hankai_y(
+                        meishiki["chishi"], d_shi, shi)  # 半会
+                else:
+                    hankai = -1
+
+                tc1 = self.is_tensen_chichu(
+                    meishiki["nitchu"][1], tsuhen, shi)  # 天戦地冲（命式）
+                tc2 = self.is_tensen_chichu(
+                    d_shi, kd.kan_tsuhen[d_kan].index(kan), shi)  # 天戦地冲（大運）
+                tc = 1 if tc1 == 1 else 2 if tc2 == 1 else -1
+
+                if tc == -1:
+                    chu = self.is_chu_y(meishiki["chishi"], d_shi, shi)  # 冲
+                else:
+                    chu = -1
+
+                kei = self.is_kei_y(meishiki["chishi"], d_shi, shi)  # 刑
+                gai = self.is_gai_y(meishiki["chishi"], d_shi, shi)  # 害
+
+                kansatsu = self.is_kansatsu(daiun[d_idx][3], tsuhen)  # 官殺混雑
+
+                nenun.append([n, kan, shi, tsuhen, kango,
+                              shigo, hogo, sango, hankai, tc, chu, kei, gai, kansatsu])
 
             idx += 1
             if idx >= 60:
@@ -206,3 +393,17 @@ class Unsei:
 
         self.unsei.update({"daiun": daiun})
         self.unsei.update({"nenun": nenun})
+
+    tsuhen_character = [
+        ['比肩が重なる比和の組み合わせで、比肩本来の意味が非常に強調され、抜群の出世運を持つ強運の組み合わせとなります。この組み合わせを月柱に持つ人は、例外なく強烈な自我と自負心を持っています。また、天才的なひらめき、センスなどがあり、一般人にはないアクの強さを発揮するので、仲間内でもひときわ目立った存在となります。自己顕示欲も旺盛で、大言壮語する傾向があり、また自分の言葉に酔う傾向もありますが、実力を伴うことが多いので、さして気にする必要もないでしょう。強烈なトップ運ですが、上に立ったとき、往々にしてワンマンになり、たとえ本人は気配りしているつもりでも、他からは強引で押し付けがましく見られます。その点は注意する必要があります。女性は運気が強くなりすぎるため、ときにマイナス傾向が生じます。世の中でバリバリ働いている女性なら問題ありませんが、専業主婦志向の女性は、結婚がスムーズに運ばなかったり、ちょっと頼りない男性と一緒になって苦労する可能性があるので注意してください。自我が強いタイプです。迷いがなく、はっきりと自己主張します。そのため、状況判断を誤ると波紋が広がったり、周囲と衝突したりすることになるので注意が必要です。親切や世話焼きは押し付けにならないようにすることも大切です。',  # 比肩 x 比肩
+         '同じ五行に属する比和の関係で、日干の意味が吉凶ともに強調されます。このタイプは、自分の思いを通さないと気の済まない性格です。そのためトラブルメーカー的な色彩が強くなり、さらに口が悪いので、敵を作って孤立しやすくなります。売られたケンカは買うタイプで、闘争心も旺盛。穏やかさ、鷹揚さといったものとは無縁の人が多く、その人生も必然的に浮き沈みが激しくなるのです。比劫星が多いので、この比劫星を生み出す印星があると、人生の浮沈はいっそう大きくなります。印綬があれば、まだ野心の達成に追い風が吹きますが、偏印があると境遇が定まらず、人格的にも難しさが増してきます。一方、比劫星を制する官星があると、比劫星の自立心、独立して一家をなそうとする気概に、官星の制御が働いて立身運になります。他の通変星の影響次第で、運気・気質が大きく変わってくる組み合わせなので、命式をよく分析するようにしてください。全般に運はあまり良いとは言えず、目が出にくい傾向がありますが、原因の多くは強すぎる自我にあります。人格を丸くしていかないと展望は開けません。また、この組み合わせのように劫財が旺じると、劫財は傷官を好むので、女性は男まさりで夫と衝突しがちでしょう。自分の主張を通さないと気が済まないタイプです。闘争心が強いため、言葉にトゲが現れることがあり、作らなくてもいい敵を作ってしまって損をすることがあります。生家から独立し、苦労を重ねた後に成功する可能性があります。',  # 比肩 x 劫財
+         '比肩が食神的になります。つまり、本来比肩に見られるような独立性の強い前向き・負けず嫌いの気質が、次第に自己満足を第一に追い求める食神の楽天性や享楽性に取って代わられるという運気なのです。月柱にこの組み合わせを持つタイプは、自分のことで頭がいっぱいになり、人のことまでなかなか頭が回りません。自分が楽しむこと、自分の望むことには貪欲で、ブレーキをかける必要を認めないため、とことん行くところまで行ってしまいます。それがスキャンダラスな事件に結びつくことも少なくないので、多少の自戒は絶対に必要です。反面ことタイプは、優れた文学性を持っています。それも難解な方面のそれではなく、大衆性のある、恋愛や人情物、推理などの分野で、自分の生き様が反映できる分野に適性と才能があるのです。このことは、他の分野にも当てはまります。好きなこと、やりたいことを抑えることのできないタイプですから、それを自覚し、好きなことをやって食べていく道を探るべきでしょう。温厚そうに見えますが、心のベクトルは常に自分を満足させることに向かっていて、周囲への配慮に欠けるきらいがあります。わがままを通せる環境では、特に自制心を働かせることに注意が必要です。表現力に優れ、好きなことを職業に選べば伸びるタイプです。',  # 比肩 x 食神
+         '比肩が傷官的になっていきます。比肩の明るく前向きに前進する建設的な気質・運気に、次第に召喚的な影が差し込み、高いプライドを満足させられるような境遇が得られないため、内向性が強まっていくという運気なのです。これは、人生の比較的早い時点で、何らかの挫折を経験することを暗示しています。その挫折を深刻に受け止めず、前向きに受け止めれば、その後の人生にさして尾を引くことはないはずなのですが、傷官の影響から深刻に受け止めがちのため、その思いに引きずられて運気が悪化し、性格も屈折してくることが多いのです。比肩の影響で、見かけは豪胆、あるいは強気に見える人もいますが、内面は繊細で、取り越し苦労をしたり、ちょっとしたことを気にかけ、長く心の中で引きずりがちな人です。ものを考えるとき、悲観的になったり、否定的になる傾向があります。これは傷官の影響ですが、よくありません。傷官に引きずられず、もともと持っている比肩のシンプルな強さに立ち返って、楽観的・肯定的に物事に対処するようにしていけば、運気は改善されていきます。元気があって発言も強気ですが、内面は意外と繊細で傷つきやすいタイプです。結果を出せなかったとき、言い訳や責任転嫁をしていると信用を失うことになるので注意が必要です。失敗や挫折を引きずらないように、ポジティブに物事に対処していけば見通しが明るいでしょう。',  # 比肩 x 傷官
+         '地星の比肩が天星の偏財を剋す逆剋です。逆剋は、一般には障害と見ます。では、何のどんな障害に出会う可能性が高いかというと、比肩は自分自身を表し、年柱や月柱の偏財は父親（男女共通）もしくは妻・愛人（男性の場合）なので、自分が父を剋して迷惑をかけるか、父が病弱、ないし女性関係でトラブルが生じる暗示があると推理するわけです。また、自分自身について見れば、偏財は財運ですから、財運に障害が出、金が入っても残らないか、見栄によって財を散じ、事業にトラブルが生じやすいなどと見るのです。ただし、剋すほうの比肩に、自力で開運して財を掴む力がありますから、食いつめるといったことはないでしょう。月柱にこの組み合わせを持つタイプは強い個人主義者で、かつ、相当な自信家です。そのため対人関係はあまりスムーズとは言えませんが、本人はさして気にしません。一芸に秀で、その道のトップに立ちうる素質を持っていますが、それは個人的な才覚・才能・技術・センスを生かした分野に限定され、総合的な指導力、管理能力の要求される分野では目が出にくい傾向があります。音楽（クラシック）のセンスのよいものが多く、自分で演じなければ鑑賞の趣味をもちます。財布の紐が緩いタイプで、散財することがあります。見栄による出費や共同事業による損失には、特に注意が必要です。自信家で個人主義的のため、その特質を生かせる仕事を選ぶと成功の可能性は高まります。例えば、一つの技芸を極める道を進むことが成功のカギになるでしょう。',  # 比肩 x 偏財
+         '比肩が正財を剋します。地が天を剋す逆剋の障害運ですが、この場合は比肩を自分と見れば、自分が正財の司る財運を支配する（剋）形ですから、相当な財運があり、また、男性の場合は正財を妻と見るので、支配できる妻、すなわち夫を立て、よく家庭を切り盛りしてくれる良妻に恵まれると見ることができるのです。月柱にこの組み合わせを持つタイプは、現実的・実務的な知性が発達しており、実利を重んじます。自分の置かれたポジションを客観的に把握し、ポジションに見合った役割を演じることができますが、理想は高く、本当の自分は違うんだという意識が、心のどこかに潜んで切ることが多いようです。自己過信、強引、無茶の一面もあります。相当な負けず嫌いで努力家ですが、そうした面はあまり表には出しません。面倒見がよく、下からの信望のあつい人で、かなりの出世運があります。蓄財精神が発達しており、うまくいくいかないは別として、多くは財テクなど、蓄財に熱心なタイプでもあります。金銭の出入りは忙しいですが、最終的には財産を築けるタイプです。負けず嫌いな努力家で、実務能力にも優れているため、社会で活躍する可能性も高いでしょう。ただし、理想を実現するために強引になりやすい点には注意が必要です。',  # 比肩 x 正財
+         '偏官が比肩を剋します。自分の中で権威と権威がぶつかり合っているような形のため、進むべき方向にエネルギーが集中できません。横槍、妨害などのせいで思うように手腕が発揮できず、苦しむ傾向があります。特に月柱にこの組み合わせがあると、開運までにかなりの苦労があります。この人は、自分を引き立ててくれていた人から手のひらを返したように冷遇されたり、今までのポジションから追われたりすることがあります。力はあっても、境遇が整わず、常に何かに頭を抑えられている状態になりやすいのです。素直で人の良いところがありますが、比肩が剋されるため、比肩の強烈な自立性が曖昧になり、また我の強さがストレートに表現できないため、内にこもって屈折したり、覇気に欠けた印象が生じます。マイペースで協調性はあみらない人ですから、個人でできる仕事が適しています。そうした仕事を選べば、じわじわと成功を掴むことができます。屈折した自己表現をしやすく、協調性もあまりないタイプです。目上の引き立てや周囲の援助に期待せず、淡々とマイペースで進められる仕事を選ぶと見通しが明るいでしょう。',  # 比肩 x 偏官
+         '正官が比肩を剋し、比肩の自立性・独立性をうまくコントロールしてくれます。その結果、この人は自分の職分を守ってコツコツと業績を積み上げていく、マイペース人間になります。周囲の状況がどうであれ、我関せずといったタイプで、それだけに自負心は強く、職人気質です。この組み合わせを月柱に持つ人は、手堅く、着実に成果を積み上げていくので、かなりの立身運が期待できます。ただ、人を押し除けてでも先に出ようとか、上に立とうという意欲は乏しいことが多く、そうしたことに魅力を感じない人も多いため、実力に比して評価が低いきらいがあるようです。また、態度が大きいというのも、評価を下げる一因です。ここにも職人気質が現れています。へそ曲りで口はよくありません。若いときは苦労しがちですが、着実に自分の世界を確立していきます。周囲に惑わされず、コツコツ実績を積み上げていく職人タイプです。周囲に甘えることが下手なため遅咲きですが、そのうち自分の世界を確立できるでしょう。',  # 比肩 x 正官
+         '比肩に',  # 比肩 x 偏印
+         '',],  # 比肩 x 印綬
+
+    ]

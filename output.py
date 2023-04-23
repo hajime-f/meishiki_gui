@@ -345,4 +345,8 @@ def output_stdio(meishiki, unsei):
         print(cont)
         year += 1
 
+    print()
+    tsuhen = meishiki.meishiki["tsuhen"]
+    print(unsei.tsuhen_character[tsuhen[5]][tsuhen[1]])
+
     return 1

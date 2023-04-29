@@ -353,9 +353,4 @@ def output_stdio(meishiki, unsei):
     print(f'月支蔵干：{kd.tsuhen[tsuhen[5]]}、月柱天干：{kd.tsuhen[tsuhen[1]]}')
     print(unsei.tsuhen_character[tsuhen[5]][tsuhen[1]])
 
-    print()
-
-    print(f'月支蔵干：{kd.tsuhen[tsuhen[5]]}、日支蔵干：{kd.tsuhen[tsuhen[6]]}')
-    print(unsei.tsuhen_character[tsuhen[5]][tsuhen[6]])
-
     return 1

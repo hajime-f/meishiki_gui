@@ -32,13 +32,13 @@ class Unsei:
             p = self.meishiki.is_setsuiri(birthday, birthday.month)
             if (s[0] == birthday.year) and (s[1] == birthday.month):
                 if not p:
-                    k = kd.setsuiri[i+1]
+                    k = kd.setsuiri[i + 1]
                     previous_setsuiri = dt(year=s[0], month=s[1], day=s[2],
                                            hour=s[3], minute=s[4])
                     next_setsuiri = dt(year=k[0], month=k[1], day=k[2],
                                        hour=k[3], minute=k[4])
                 else:
-                    k = kd.setsuiri[i-1]
+                    k = kd.setsuiri[i - 1]
                     previous_setsuiri = dt(year=k[0], month=k[1], day=k[2],
                                            hour=k[3], minute=k[4])
                     next_setsuiri = dt(year=s[0], month=s[1], day=s[2],
@@ -53,6 +53,11 @@ class Unsei:
             (diff_previous.days + (diff_previous.seconds / 60 / 60 / 24)) / 3)
         n_year = round(
             (diff_next.days + (diff_next.seconds / 60 / 60 / 24)) / 3)
+
+        if p_year == 0:
+            p_year = 1
+        if n_year == 0:
+            n_year = 1
 
         year_ratio_list = [p_year, n_year]
 

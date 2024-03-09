@@ -13,13 +13,15 @@
 
 # 動作を確認した環境
 
-- macOS Ventura 13.3.1
-- Python 3.11.2
+- macOS Sonoma 14.4
+- Python 3.12.2
 
 # 使い方
 ```
-$ python -m pip install -r requirement.txt
-$ python meshiki_gui.py
+$ source ./local_python/bin/activate
+(local_python)$ make install
+(local_python)$ make
+(local_python)$ deactivate
 ```
 
 # Windows で exe 化する場合の手順

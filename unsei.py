@@ -55,9 +55,9 @@ class Unsei:
             (diff_next.days + (diff_next.seconds / 60 / 60 / 24)) / 3)
 
         if p_year == 0:
-            p_year = 1
+            p_year = 10
         if n_year == 0:
-            n_year = 1
+            n_year = 10
 
         year_ratio_list = [p_year, n_year]
 

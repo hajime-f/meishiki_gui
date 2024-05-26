@@ -24,6 +24,8 @@ def output_html(meishiki, unsei):
                 f'{wareki}%-m月%-d日 %-H時%-M分生')
     else:
         if os.name == 'nt':
+            import locale
+            locale.setlocale(locale.LC_CTYPE, "Japanese_Japan.932")
             birthday_str = meishiki.birthday.strftime(
                 f'{wareki}%#m月%#d日 -時-分生')
         else:

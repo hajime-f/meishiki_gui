@@ -212,9 +212,11 @@ else:
         sex = int(sys.argv[3])
         birthday = dt.strptime(b + ' ' + t, '%Y-%m-%d %H:%M')
         t_flag = True
+
         # サマータイムを考慮する
-        if (dt(year=1948, month=5, day=2) <= birthday < dt(year=1951, month=9, day=8)) and (birthday.hour is not None):
-            birthday = dt(year=birthday.year, month=birthday.month, day=birthday.day,
+        if birthday.hour is not None:
+            if dt(year=1948, month=5, day=2) <= birthday <= dt(year=1948, month=9, day=11) or dt(year=1949, month=4, day=3) <= birthday <= dt(year=1949, month=9, day=10) or dt(year=1950, month=5, day=7) <= birthday <= dt(year=1950, month=9, day=9) or dt(year=1951, month=5, day=6) <= birthday <= dt(year=1951, month=9, day=8):
+                birthday = dt(year=birthday.year, month=birthday.month, day=birthday.day,
                           hour=birthday.hour - 1, minute=birthday.minute)
 
     except IndexError:
